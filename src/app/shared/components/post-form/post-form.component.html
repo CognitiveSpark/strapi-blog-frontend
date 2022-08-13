@@ -1,62 +1,50 @@
 <form [formGroup]="postForm" class="post-creator">
-    <label class="relative block">
-        <span class="sr-only">Title</span>
-        <input
-                formControlName="Title"
-                class="mb-3 placeholder:italic placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md py-2 pl-3 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm"
-                placeholder="Post title"
-                type="text"
-                name="search"/>
-    </label>
-    <label class="relative block">
-        <span class="sr-only">Title</span>
-        <textarea
-                formControlName="Content"
-                class="mb-3 placeholder:italic placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md py-2 pl-3 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm"
-                placeholder="Post content"
-                name="content"></textarea>
-    </label>
+  <label class="relative block">
+    <span class="sr-only">Title</span>
+    <input
+        formControlName="Title"
+        class="mb-3 placeholder:italic placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md py-2 pl-3 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm"
+        placeholder="Post title"
+        type="text"
+        name="search"/>
+  </label>
+  <label class="relative block">
+    <span class="sr-only">Title</span>
+    <textarea
+        formControlName="Content"
+        class="mb-3 placeholder:italic placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md py-2 pl-3 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm"
+        placeholder="Post content"
+        name="content"></textarea>
+  </label>
 
-    <label class="relative block">
-        <span class="sr-only">Locale</span>
-        <select
-                formControlName="Locale"
-                class="mb-3 placeholder:italic placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md py-2 pl-3 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm"
-                name="content">
-            <option value="">--Please choose a locale--</option>
-            <option [value]="locale.code" *ngFor="let locale of locales">{{ locale.name }}</option>
-        </select>
-    </label>
+  <label class="relative block">
+    <span class="sr-only">Locale</span>
+    <select
+        formControlName="Locale"
+        class="mb-3 placeholder:italic placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md py-2 pl-3 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm"
+        name="content">
+      <option value="">--Please choose a locale--</option>
+      <option [value]="locale.code" *ngFor="let locale of locales">{{ locale.name }}</option>
+    </select>
+  </label>
 
-    <label *ngIf="editMode" class="relative block">
-        <div class="text-xs">Current order: {{ postForm.get('Order')?.value }}</div>
-        <span class="sr-only">Order</span>
-        <select
-            formControlName="Locale"
-            class="mb-3 placeholder:italic placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md py-2 pl-3 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm"
-            name="content">
-            <option value="" disabled>-- New order --</option>
-            <option [value]="order" *ngFor="let order of busyOrders">{{ order }}</option>
-        </select>
-    </label>
+  <label class="relative block">
+    <span class="sr-only">Thumbnail</span>
+    <input
+        #thumbnail
+        class="mb-3 placeholder:italic placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md py-2 pl-3 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm"
+        placeholder="Post thumbnail"
+        type="file"
+        (change)="handleFileInput($event.target)"
+        name="search"/>
+  </label>
 
-    <label class="relative block">
-        <span class="sr-only">Thumbnail</span>
-        <input
-            #thumbnail
-            class="mb-3 placeholder:italic placeholder:text-slate-400 block bg-white w-full border border-slate-300 rounded-md py-2 pl-3 pr-3 shadow-sm focus:outline-none focus:border-sky-500 focus:ring-sky-500 focus:ring-1 sm:text-sm"
-            placeholder="Post thumbnail"
-            type="file"
-            (change)="handleFileInput($event.target)"
-            name="search"/>
-    </label>
+  <button
+      *ngIf="editMode else createButton"
+      class="col-span-2 ease-out duration-300 hover:bg-slate-600 rounded-lg bg-violet-600 px-8 py-2 text-white mr-2.5"
+      (click)="onUpdate()">Update post</button>
 
-    <button
-        *ngIf="editMode else createButton"
-        class="col-span-2 ease-out duration-300 hover:bg-slate-600 rounded-lg bg-violet-600 px-8 py-2 text-white mr-2.5"
-        (click)="onUpdate()">Update post</button>
-
-    <ng-template #createButton>
-        <button class="col-span-2 ease-out duration-300 hover:bg-slate-600 rounded-lg bg-violet-600 px-8 py-2 text-white mr-2.5" (click)="onCreate()">Create post</button>
-    </ng-template>
+  <ng-template #createButton>
+    <button class="col-span-2 ease-out duration-300 hover:bg-slate-600 rounded-lg bg-violet-600 px-8 py-2 text-white mr-2.5" (click)="onCreate()">Create post</button>
+  </ng-template>
 </form>

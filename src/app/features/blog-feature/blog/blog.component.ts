@@ -2,11 +2,11 @@ import {HttpClient}                                                    from '@an
 import {Component, OnDestroy, OnInit}                                  from '@angular/core';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {distinctUntilChanged, of, pluck, Subscription, switchMap, tap} from 'rxjs';
-import {environment}                                               from '../../../../environments/environment';
+import {environment}                                                                  from '../../../../environments/environment';
 import {StrapiLocale, StrapiPost, StrapiPostsResponse, StrapiUser} from '../../../../interfaces';
 import {
   AuthService
-}                                                                  from '../../../services/auth-service/auth.service';
+}                                                                                     from '../../../services/auth-service/auth.service';
 import {
   LocaleService
 } from '../../../services/locale-service/locale.service';
@@ -46,6 +46,13 @@ export class BlogComponent implements OnInit, OnDestroy {
     this.subscriptions.add(this.paginationPageWatcher());
     this.subscriptions.add(this.getLocales());
     this.subscriptions.add(this.checkIsAuth());
+
+    this.postsService.getOrderedPosts()
+      .subscribe((res: any) => {
+        // res.map((item) => {
+        //
+        // })
+      })
   }
 
   public ngOnDestroy(): void {
@@ -79,13 +86,13 @@ export class BlogComponent implements OnInit, OnDestroy {
         tap(({page, locale}) => {
           this.paginationPage = page;
           this.currentLocale = locale;
-          this.getAllPosts(this.paginationPage, locale);
+          this.getPosts(this.paginationPage, locale);
         })
       )
       .subscribe()
   }
 
-  private getAllPosts(page?: number, locale?: string): Subscription {
+  private getPosts(page?: number, locale?: string): Subscription {
     return this.postsService.getPosts(page, undefined, locale)
       .pipe(
         tap(({ data, meta }: StrapiPostsResponse) => {
@@ -121,12 +128,12 @@ export class BlogComponent implements OnInit, OnDestroy {
 
     this.router.navigate([this.currentLocale, 'blog', page]);
 
-    this.getAllPosts(+page);
+    this.getPosts(+page);
   }
 
   public changeLocale(code: string): void {
     this.router.navigate([code, 'blog', this.paginationPage]);
 
-    this.getAllPosts(5, code);
+    this.getPosts(5, code);
   }
 }

@@ -20,7 +20,6 @@ interface PostForm {
   Content: FormControl,
   Locale: FormControl,
   Thumbnail: FormControl,
-  Order?: FormControl
 }
 
 @Component({
@@ -32,9 +31,8 @@ export class PostFormComponent implements OnInit, OnDestroy {
   @ViewChild('thumbnail')
   private thumbnailField!: ElementRef;
   private subscription: Subscription = new Subscription();
-  private order!: number;
+  private currentPost!: StrapiPost;
 
-  public busyOrders: number[] = [];
   public locales: StrapiLocale[] = [];
   public editMode: boolean = false;
   public postForm: FormGroup<PostForm> = new FormGroup<PostForm>({
@@ -53,7 +51,6 @@ export class PostFormComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subscription.add(this.getLocales());
-    this.subscription.add(this.getPostsOrders());
     this.subscription.add(this.ifEditMode());
   }
 
@@ -78,6 +75,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
         }),
         tap((res: Params | StrapiPostResponse) => {
           if(res.data) {
+            this.currentPost = res.data;
             this.setFormData(res.data);
           }
         })
@@ -86,15 +84,11 @@ export class PostFormComponent implements OnInit, OnDestroy {
   }
 
   private setFormData(res: StrapiPost) {
-    this.postForm.addControl('Order', new FormControl())
-
     for (const fieldKey in res.attributes) {
       if(this.postForm.value.hasOwnProperty(fieldKey) && fieldKey !== 'Thumbnail') {
         this.postForm.get(fieldKey)?.setValue(res.attributes[fieldKey as keyof StrapiPostAttributes]);
       }
     }
-
-    console.log(this.postForm.value);
   }
 
   public handleFileInput(file: any): void {
@@ -102,16 +96,6 @@ export class PostFormComponent implements OnInit, OnDestroy {
     const files: FileList = file.files;
 
     this.postForm.get('Thumbnail')?.setValue(files.item(0));
-  }
-
-  private getPostsOrders(): Subscription {
-    return this.postsService.getPostsOrder()
-      .pipe(
-        tap((orders: number[]) => {
-          this.busyOrders = orders;
-        })
-      )
-      .subscribe();
   }
 
   private getLocales(): Subscription {
@@ -129,30 +113,7 @@ export class PostFormComponent implements OnInit, OnDestroy {
       .getCurrentUser()
       .pipe(
         switchMap((author: StrapiUser) => {
-          const {Title, Content, Locale, Thumbnail} = this.postForm.value;
-          const formData: FormData = new FormData();
-          const imageId: string = Title.toLowerCase().replaceAll(' ', '-');
-          this.order = this.busyOrders.length > 0 ? Math.max(...this.busyOrders) + 1 : 1;
-
-          this.busyOrders.push(this.order);
-
-          if(Thumbnail) {
-            formData.append(`files.Thumbnail`, Thumbnail, Thumbnail.name);
-            formData.append(`ref`, 'api::post.post');
-            formData.append(`refId`, imageId);
-            formData.append(`field`, 'Thumbnail');
-          }
-
-          const stringifyData: string = JSON.stringify({
-            Title,
-            Content,
-            locale: Locale,
-            author,
-            Order: this.order
-          })
-          formData.append('data', stringifyData);
-
-          return this.postsService.createPost(formData)
+          return this.postsService.createPost(this.createFormData(author));
         })
       )
       .subscribe((data: StrapiPostResponse) => {
@@ -164,7 +125,35 @@ export class PostFormComponent implements OnInit, OnDestroy {
   }
 
   public onUpdate(): void {
-    // this.postsService.updatePost()
-    //   .subscribe(console.log);
+    this.postsService.updatePost(this.currentPost.id, this.createFormData())
+      .subscribe((data: StrapiPostResponse) => {
+        console.log('✅ Post successfully edited! Post: ', data);
+
+        this.postForm.reset();
+        this.thumbnailField.nativeElement.value = null;
+      })
+  }
+
+  private createFormData(author?: StrapiUser): FormData {
+    const {Title, Content, Locale, Thumbnail} = this.postForm.value;
+    const formData: FormData = new FormData();
+    const imageId: string = Title.toLowerCase().replaceAll(' ', '-');
+
+    if(Thumbnail) {
+      formData.append(`files.Thumbnail`, Thumbnail, Thumbnail.name);
+      formData.append(`ref`, 'api::post.post');
+      formData.append(`refId`, imageId);
+      formData.append(`field`, 'Thumbnail');
+    }
+
+    const stringifyData: string = JSON.stringify({
+      Title,
+      Content,
+      locale: Locale,
+      author,
+    })
+    formData.append('data', stringifyData);
+
+    return formData;
   }
 }

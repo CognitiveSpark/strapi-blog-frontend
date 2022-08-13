@@ -35,6 +35,25 @@ export interface StrapiPostCreated {
   locale?: string;
 }
 
+export interface StrapiOrderedPostsResponse {
+  data: {
+    id: number;
+    attributes: {
+      Orderer: StrapiOrderedPost[];
+      publishedAt: string;
+      updatedAt: string;
+    }
+  },
+  meta: any;
+}
+
+export interface StrapiOrderedPost {
+  id: number;
+  post: {
+    data: StrapiPost;
+  };
+}
+
 export interface StrapiPostsResponse {
   data: StrapiPost[],
   meta: {

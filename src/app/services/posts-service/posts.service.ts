@@ -1,16 +1,16 @@
 import {HttpClient}                                                               from '@angular/common/http';
 import { Injectable }                                                             from '@angular/core';
 import {Form}                                                                     from '@angular/forms';
-import {Params}                                from '@angular/router';
-import {BehaviorSubject, map, Observable, tap} from 'rxjs';
-import {environment} from '../../../environments/environment';
+import {Params}                                       from '@angular/router';
+import {BehaviorSubject, map, Observable, pluck, tap} from 'rxjs';
+import {environment}                                  from '../../../environments/environment';
 import {
   StrapiPostsResponse,
   StrapiPostCreated,
   StrapiPostResponse,
   StrapiLocale,
-  StrapiPost
-}                    from '../../../interfaces';
+  StrapiPost, StrapiOrderedPostsResponse
+} from '../../../interfaces';
 import {AuthService} from '../auth-service/auth.service';
 
 @Injectable({
@@ -26,6 +26,13 @@ export class PostsService {
     private authService: AuthService
   ) { }
 
+  public getOrderedPosts(): Observable<StrapiOrderedPostsResponse> {
+    return this.http.get<StrapiOrderedPostsResponse>(`${environment.strapi}/api/order-single?populate[Orderer][populate][0]=post.author&populate[Orderer][populate][1]=post.Thumbnail`)
+      // .pipe(
+      //   pluck('data', 'attributes', 'Orderer'),
+      // )
+  }
+
   public createPost(post: FormData): Observable<StrapiPostResponse> {
     return this.http.post<StrapiPostResponse>(`${environment.strapi}/api/posts?populate=*`, post, {
       headers: this.postHeaders
@@ -36,15 +43,6 @@ export class PostsService {
     return this.http.put<StrapiPostResponse>(`${environment.strapi}/api/posts/${postId}`, post, {
       headers: this.postHeaders
     })
-  }
-
-  public getPostsOrder(): Observable<number[]> {
-    return this.http.get<StrapiPostsResponse>(`${environment.strapi}/api/posts`)
-      .pipe(
-        map((response: StrapiPostsResponse) => {
-          return response.data.map((post: StrapiPost) => post.attributes.Order)
-        })
-      )
   }
 
   public getPostById(postId: number): Observable<any> {

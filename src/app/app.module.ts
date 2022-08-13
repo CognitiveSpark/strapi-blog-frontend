@@ -15,18 +15,18 @@ const ERROR_INTERCEPTOR_PROVIDER: Provider = {
 };
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    NotFoundComponent,
-  ],
-  imports: [
-    AppRoutingModule,
-    BlogModule,
-    BrowserModule,
-    HttpClientModule,
-    AuthModule
-  ],
-  providers: [ERROR_INTERCEPTOR_PROVIDER],
-  bootstrap: [AppComponent]
+	declarations: [
+		AppComponent,
+		NotFoundComponent,
+	],
+	imports: [
+		AppRoutingModule,
+		BlogModule,
+		BrowserModule,
+		HttpClientModule,
+		AuthModule
+	],
+	providers: [ERROR_INTERCEPTOR_PROVIDER],
+	bootstrap: [AppComponent]
 })
 export class AppModule { }

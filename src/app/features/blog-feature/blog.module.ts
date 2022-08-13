@@ -2,6 +2,7 @@ import { NgModule }           from '@angular/core';
 import { CommonModule }       from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
 import {PostFormComponent}    from '../../shared/components/post-form/post-form.component';
+import {SharedModule}         from '../../shared/shared.module';
 import { BlogComponent }      from './blog/blog.component';
 import { PostComponent }      from './components/post/post.component';
 import {PostResolver}         from './resolvers/post-resolver/post.resolver';
@@ -39,7 +40,8 @@ const routes: Routes = [
 	],
 	imports: [
 		RouterModule.forChild(routes),
-		CommonModule
+		CommonModule,
+		SharedModule
 	]
 })
 export class BlogModule {}
