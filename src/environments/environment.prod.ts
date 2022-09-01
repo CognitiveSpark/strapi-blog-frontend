@@ -1,3 +1,4 @@
 export const environment = {
-  production: true
+  production: true,
+  strapi: 'https://cgspark-strapi-blog.herokuapp.com'
 };
