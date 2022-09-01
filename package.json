@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --base-href=\"/strapi-blog-frontend/\" --output-path dist && node patch-build.js",
+    "build": "ng build --base-href=\"/strapi-blog-frontend/dist/\" --output-path dist && node patch-build.js",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
