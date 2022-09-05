@@ -20,18 +20,14 @@ export class PostsService {
     private authService: AuthService
   ) { }
 
-  public addThumbnail(formData: FormData): Observable<any> {
-    return this.http.post(`${environment.strapi}/api/upload`, formData)
-  }
-
   public createPost(post: FormData): Observable<StrapiPostResponse> {
-    return this.http.post<StrapiPostResponse>(`${environment.strapi}/api/posts`, post, {
+    return this.http.post<StrapiPostResponse>(`${environment.strapi}/api/posts?populate=*`, post, {
       headers: this.postHeaders
     })
   }
 
   public getPostById(postId: number): Observable<any> {
-    return this.http.get(`${environment.strapi}/api/posts/${postId}`)
+    return this.http.get(`${environment.strapi}/api/posts/${postId}?populate=*`)
   }
 
   public getPosts(page: number = 1, pageSize: number = 5, locale: string = 'en'): Observable<StrapiPostsResponse> {

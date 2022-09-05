@@ -1,6 +1,8 @@
+import {HttpClient}                                                    from '@angular/common/http';
 import {Component, OnDestroy, OnInit}                                  from '@angular/core';
 import {ActivatedRoute, Params, Router}                                from '@angular/router';
 import {distinctUntilChanged, of, pluck, Subscription, switchMap, tap} from 'rxjs';
+import {environment}                                                   from '../../../../environments/environment';
 import {StrapiLocale, StrapiPost, StrapiPostsResponse}                 from '../../../../interfaces';
 import {
   LocaleService
@@ -27,12 +29,18 @@ export class BlogComponent implements OnInit, OnDestroy {
     private postsService: PostsService,
     private localeService: LocaleService,
     private activatedRoute: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private http: HttpClient
   ) { }
 
   ngOnInit(): void {
     this.subscriptions.add(this.paginationPageWatcher());
     this.subscriptions.add(this.getLocales());
+
+    this.http.get(`${environment.strapi}/api/posts?populate=*`)
+      .subscribe((res) => {
+        console.log('f', res);
+      })
   }
 
   public ngOnDestroy(): void {

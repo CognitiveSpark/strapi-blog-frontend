@@ -87,6 +87,12 @@ export interface StrapiPost {
     locale: string
     publishedAt: string;
     updatedAt: string;
+    author?: {
+      data: {
+        id?: number | null;
+        attributes?: StrapiUser | null;
+      }
+    }
   },
   id: number
 }

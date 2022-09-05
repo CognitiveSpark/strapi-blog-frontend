@@ -1,10 +1,11 @@
-import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {AbstractControl, FormControl, FormGroup}             from '@angular/forms';
+import {Component, ElementRef, OnDestroy, OnInit, ViewChild}   from '@angular/core';
+import {AbstractControl, FormControl, FormGroup}               from '@angular/forms';
 import {Route, Router}                                         from '@angular/router';
-import {Subscription, tap}                                     from 'rxjs';
-import {StrapiLocale, StrapiPostResponse, StrapiPostsResponse} from '../../../../interfaces';
-import {LocaleService}                                         from '../../../services/locale-service/locale.service';
+import {Subscription, switchMap, tap}                                      from 'rxjs';
+import {StrapiLocale, StrapiPostResponse, StrapiPostsResponse, StrapiUser} from '../../../../interfaces';
+import {LocaleService}                                                     from '../../../services/locale-service/locale.service';
 import {PostsService}                                          from '../../../services/posts-service/posts.service';
+import {UserService}                                           from '../../../services/user-service/user.service';
 
 interface PostForm {
   Title: FormControl,
@@ -35,6 +36,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   constructor(
     private postsService: PostsService,
     private localeService: LocaleService,
+    private userService: UserService,
     private router: Router
   ) { }
 
@@ -64,25 +66,32 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   public onCreate(): void {
-    const {Title, Content, Locale, Thumbnail} = this.postForm.value;
-    const formData: FormData = new FormData();
-    const imageId: string = Title.toLowerCase().replaceAll(' ', '-');
+    this.userService
+      .getCurrentUser()
+      .pipe(
+        switchMap((author: StrapiUser) => {
+          const {Title, Content, Locale, Thumbnail} = this.postForm.value;
+          const formData: FormData = new FormData();
+          const imageId: string = Title.toLowerCase().replaceAll(' ', '-');
 
-    if(Thumbnail) {
-      formData.append(`files.Thumbnail`, Thumbnail, Thumbnail.name);
-      formData.append(`ref`, 'api::post.post');
-      formData.append(`refId`, imageId);
-      formData.append(`field`, 'Thumbnail');
-    }
+          if(Thumbnail) {
+            formData.append(`files.Thumbnail`, Thumbnail, Thumbnail.name);
+            formData.append(`ref`, 'api::post.post');
+            formData.append(`refId`, imageId);
+            formData.append(`field`, 'Thumbnail');
+          }
 
-    const stringifyData: string = JSON.stringify({
-      Title,
-      Content,
-      locale: Locale
-    })
-    formData.append('data', stringifyData);
+          const stringifyData: string = JSON.stringify({
+            Title,
+            Content,
+            locale: Locale,
+            author
+          })
+          formData.append('data', stringifyData);
 
-    this.postsService.createPost(formData)
+          return this.postsService.createPost(formData)
+        })
+      )
       .subscribe((data: StrapiPostResponse) => {
         console.log('✅ Post successfully created! Post: ', data);
 

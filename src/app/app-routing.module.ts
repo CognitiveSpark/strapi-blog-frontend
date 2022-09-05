@@ -1,6 +1,5 @@
 import { NgModule }                              from '@angular/core';
 import {PreloadAllModules, RouterModule, Routes} from '@angular/router';
-import {StrapiLocale}                            from '../interfaces';
 import {AuthComponent}                           from './features/auth-feature/auth/auth.component';
 import {BlogModule}                              from './features/blog-feature/blog.module';
 import {DashboardModule}                         from './features/dashboard-feature/dashboard.module';
