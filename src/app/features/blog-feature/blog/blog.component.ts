@@ -1,13 +1,19 @@
 import {HttpClient}                                                    from '@angular/common/http';
 import {Component, OnDestroy, OnInit}                                  from '@angular/core';
-import {ActivatedRoute, Params, Router}                                from '@angular/router';
+import {ActivatedRoute, Params, Router} from '@angular/router';
 import {distinctUntilChanged, of, pluck, Subscription, switchMap, tap} from 'rxjs';
-import {environment}                                                   from '../../../../environments/environment';
-import {StrapiLocale, StrapiPost, StrapiPostsResponse}                 from '../../../../interfaces';
+import {environment}                                               from '../../../../environments/environment';
+import {StrapiLocale, StrapiPost, StrapiPostsResponse, StrapiUser} from '../../../../interfaces';
+import {
+  AuthService
+}                                                                  from '../../../services/auth-service/auth.service';
 import {
   LocaleService
-}                                                                      from '../../../services/locale-service/locale.service';
-import {PostsService}                                                  from '../../../services/posts-service/posts.service';
+} from '../../../services/locale-service/locale.service';
+import {PostsService} from '../../../services/posts-service/posts.service';
+import {
+  UserService
+} from '../../../services/user-service/user.service';
 
 @Component({
   selector: 'app-blog',
@@ -19,6 +25,8 @@ export class BlogComponent implements OnInit, OnDestroy {
   public locales: StrapiLocale[] = [];
   public disableNextButton: boolean = false;
   public disablePrevButton: boolean = false;
+  public isAuth: boolean = false;
+  public authUser!: StrapiUser | null;
 
   private pageCount!: number;
   private readonly subscriptions: Subscription = new Subscription();
@@ -29,22 +37,30 @@ export class BlogComponent implements OnInit, OnDestroy {
     private postsService: PostsService,
     private localeService: LocaleService,
     private activatedRoute: ActivatedRoute,
+    private authService: AuthService,
+    private userService: UserService,
     private router: Router,
-    private http: HttpClient
   ) { }
 
   ngOnInit(): void {
     this.subscriptions.add(this.paginationPageWatcher());
     this.subscriptions.add(this.getLocales());
-
-    this.http.get(`${environment.strapi}/api/posts?populate=*`)
-      .subscribe((res) => {
-        console.log('f', res);
-      })
+    this.subscriptions.add(this.checkIsAuth());
   }
 
   public ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
+
+    this.authUser = null;
+  }
+
+  private checkIsAuth(): Subscription {
+    this.isAuth = this.authService.isAuthenticated()
+
+    return this.userService.getCurrentUser()
+      .subscribe((user: StrapiUser) => {
+        this.authUser = user;
+      })
   }
 
   private getLocales(): Subscription {

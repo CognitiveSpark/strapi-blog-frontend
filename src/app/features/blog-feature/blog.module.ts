@@ -1,7 +1,7 @@
 import { NgModule }           from '@angular/core';
 import { CommonModule }       from '@angular/common';
 import {RouterModule, Routes} from '@angular/router';
-import {PostsService}         from '../../services/posts-service/posts.service';
+import {PostFormComponent}    from '../../shared/components/post-form/post-form.component';
 import { BlogComponent }      from './blog/blog.component';
 import { PostComponent }      from './components/post/post.component';
 import {PostResolver}         from './resolvers/post-resolver/post.resolver';
@@ -20,19 +20,26 @@ const routes: Routes = [
         },
         path: ':post-id',
         component: PostComponent
-      }
+      },
+			{
+				path: ':post-id/edit',
+				component: PostFormComponent
+			}
     ]
   },
 ];
 
 @NgModule({
-  declarations: [
-    BlogComponent,
-    PostComponent
-  ],
-  imports: [
-    RouterModule.forChild(routes),
-    CommonModule
-  ]
+	declarations: [
+		BlogComponent,
+		PostComponent
+	],
+	exports: [
+		BlogComponent
+	],
+	imports: [
+		RouterModule.forChild(routes),
+		CommonModule
+	]
 })
 export class BlogModule {}

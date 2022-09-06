@@ -79,22 +79,25 @@ export interface StrapiImage {
 }
 
 export interface StrapiPost {
-  attributes: {
-    Content: string;
-    Thumbnail: StrapiImage;
-    Title: string;
-    createdAt: string
-    locale: string
-    publishedAt: string;
-    updatedAt: string;
-    author?: {
-      data: {
-        id?: number | null;
-        attributes?: StrapiUser | null;
-      }
-    }
-  },
+  attributes: StrapiPostAttributes,
   id: number
+}
+
+export interface StrapiPostAttributes {
+  Content: string;
+  Thumbnail: StrapiImage;
+  Order: number;
+  Title: string;
+  createdAt: string
+  locale: string
+  publishedAt: string;
+  updatedAt: string;
+  author?: {
+    data: {
+      id?: number | null;
+      attributes?: StrapiUser | null;
+    }
+  }
 }
 
 export interface StrapiLocale {
