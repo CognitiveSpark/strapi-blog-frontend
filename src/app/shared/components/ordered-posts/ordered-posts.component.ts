@@ -33,7 +33,7 @@ export class OrderedPostsComponent implements OnInit, OnDestroy {
           return posts.map((post: StrapiOrderedPost) => post.post.data);
         })
       )
-      .subscribe((posts) => {
+      .subscribe((posts: any) => {
         console.log(posts);
         this.posts = posts;
       });
